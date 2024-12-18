@@ -1,0 +1,37 @@
+is_permutation([], []).
+is_permutation([H|T], L) :- delete(H, L, L1), is_permutation(T, L1).
+delete(X, [X|T], T).
+delete(X, [H|T], [H|R]) :- delete(X, T, R).
+
+left_of(V1, V2, [V1, V2|_]).
+left_of(V1, V2, [_|T]) :- left_of(V1, V2, T).
+
+opposite(V1, V2, [V1, _, V2|_]).
+opposite(V1, V2, [_|T]) :- opposite(V1, V2, T).
+
+solve(Animals) :-
+  Animals = [animal(Name1, Collection1), animal(Name2, Collection2), animal(Name3, Collection3), animal(Name4, Collection4)],
+  member(animal(волк, фауна), Animals),
+  (member(animal(нуф, флора), Animals); member(animal(нуф, космос), Animals)),
+  left_of(animal(волк, _), animal(наф, _), Animals),
+  left_of(animal(_, космос), animal(ниф, _), Animals),
+  opposite(animal(нуф, _), animal(наф, _), Animals),
+  is_permutation([Name1, Name2, Name3, Name4], [волк, наф, нуф, ниф]),
+  is_permutation([Collection1, Collection2, Collection3, Collection4], [фауна, флора, космос, спорт]),
+  format('~nРешение:~n', []),
+  write(Animals),
+  nl.
+
+
+:- findall(Animals, solve(Animals), AllSolutions),
+   (   AllSolutions == []
+   ->  write('Нет решений.')
+   ;   maplist(write_solution, AllSolutions)
+   ).
+
+write_solution(Animals) :-
+    format('~nРассадка: ~w~n', [Animals]),
+    maplist(write_animal_collection, Animals).
+
+write_animal_collection(animal(Name, Collection)) :-
+    format('~w собирает ~w~n', [Name, Collection]).
